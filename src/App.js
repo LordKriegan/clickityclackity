@@ -20,7 +20,7 @@ class App extends Component {
     const cardList = [];
     //build cardlist
     for (let i = 0; i < cats.length; i++) {
-      cardList.push(<Card setScore={this.setScore} img={cats[i]} />)
+      cardList.push(<Card key={"cat" + i} setScore={this.setScore} img={cats[i]} />)
     }
     return this.shuffleCards(cardList);
   }
@@ -35,13 +35,17 @@ class App extends Component {
   }
 
   setScore = (score) => {
+    let cardList, newScore;
     if (score) {
-      this.setState({ cardList: this.createCards(), score: 0 })
-      console.log("found the same image again")
+      cardList = this.createCards();
+      newScore = 0;
+      console.log("found the same image again");
     } else {
-      this.setState({ cardList: this.shuffleCards(this.state.cardList), score: this.state.score++ })
-      console.log("found a new image")
+      cardList = this.shuffleCards(this.state.cardList);
+      newScore = this.state.score + 1;
+      console.log("found a new image");
     }
+    setTimeout(this.setState({ cardList: cardList, score: newScore }), 2000);
   }
 
   render() {

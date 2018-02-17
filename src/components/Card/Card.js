@@ -17,7 +17,9 @@ class Card extends React.Component {
         this.props.setScore(this.state.cardFound)
         this.setState({cardFound: true})
     }
-
+    componentDidMount() {
+        this.setState({isFlipped: false})
+    }
     render() {
         return (
             <div className="col-xs-4">
