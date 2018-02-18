@@ -13,7 +13,7 @@ class Game extends React.Component {
   constructor() {
     super();
     this.state = {
-      cardList: this.createCards(),
+      cardList: this.shuffleCards(this.createCards()),
       score: 0
     }
   }
@@ -29,7 +29,7 @@ class Game extends React.Component {
         isFlipped: false,
       })
     }
-    return this.shuffleCards(cardList);
+    return cardList;
   }
 
   shuffleCards = (array) => {
@@ -40,23 +40,45 @@ class Game extends React.Component {
     }
     return array;
   }
+/*
+jesus christ callback hell x_x i give up on this
+it SEEMS to correctly track score? but it flips the tiles in the wrong position. 
+its somehow rendering before i want it to flip
 
-  setScore = (score, key) => {
+logic:
+  A change isFlipped property in corresponding element in array, setstate to rerender with a flipped tile
+  B set a timer so that gifs can play for a couple seconds before game moves forward
+  C logic for figuring out whether guess was right or not
+  D reset all tiles to not be flipped
+  E set state with a new shuffled list
+*/
+
+  setScore = (cardFound, key) => {
     let cardList = this.state.cardList
-    let newScore = 0;
-    if (score) {
-      cardList = this.createCards();
-      console.log("found the same image again");
-    } else {
-      cardList[key].cardFound = true;
-      cardList = this.shuffleCards(this.state.cardList);
-      newScore = this.state.score;
-      newScore++;
-      console.log("found a new image");
-    }
-    console.log("time to update")
-    console.log(cardList)
-    setTimeout(this.setState({ cardList: cardList, score: newScore }), 2000);
+    cardList[key].isFlipped = true;
+    this.setState({ //A
+      cardList: cardList
+    }, () => {
+      setTimeout(() => {//B
+        let newScore = 0;//C
+        if (cardFound) {
+          cardList = this.createCards();
+          console.log("found the same image again");
+        } else {
+          cardList[key].cardFound = true;
+          newScore = this.state.score;
+          newScore++;
+          console.log("found a new image");
+        }
+        console.log("time to update")
+        console.log(cardList)
+        for (let i = 0; i < cardList.length; i++) cardList[i].isFlipped = false;//D
+        this.setState({//E
+          cardList: this.shuffleCards(cardList),
+          score: newScore
+        });
+      }, 2000)
+    })
   }
 
   render() {
@@ -68,17 +90,17 @@ class Game extends React.Component {
         <div className="container">
           <div style={{ paddingTop: "5px", paddingBottom: "5px" }} className="row">
             {this.state.cardList.slice(0, 3).map((elem, i) => {
-              return <Card cardFound={elem.cardFound} isFlipped= {elem.isFlipped} key={elem.index} index={elem.index} setScore={self.setScore} img={elem.img} />
+              return <Card cardFound={elem.cardFound} isFlipped={elem.isFlipped} key={elem.index} index={elem.index} setScore={self.setScore} img={elem.img} />
             })}
           </div>
           <div style={{ paddingTop: "5px", paddingBottom: "5px" }} className="row">
-          {this.state.cardList.slice(3, 6).map((elem, i) => {
-              return <Card cardFound={elem.cardFound} isFlipped= {elem.isFlipped} key={elem.index} index={elem.index} setScore={self.setScore} img={elem.img} />
+            {this.state.cardList.slice(3, 6).map((elem, i) => {
+              return <Card cardFound={elem.cardFound} isFlipped={elem.isFlipped} key={elem.index} index={elem.index} setScore={self.setScore} img={elem.img} />
             })}
           </div>
           <div style={{ paddingTop: "5px", paddingBottom: "5px" }} className="row">
-          {this.state.cardList.slice(6).map((elem, i) => {
-              return <Card cardFound={elem.cardFound} isFlipped= {elem.isFlipped} key={elem.index} index={elem.index} setScore={self.setScore} img={elem.img} />
+            {this.state.cardList.slice(6).map((elem, i) => {
+              return <Card cardFound={elem.cardFound} isFlipped={elem.isFlipped} key={elem.index} index={elem.index} setScore={self.setScore} img={elem.img} />
             })}
           </div>
         </div>
