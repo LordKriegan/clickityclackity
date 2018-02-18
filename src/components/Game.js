@@ -21,7 +21,13 @@ class Game extends React.Component {
     const cardList = [];
     //build cardlist
     for (let i = 0; i < cats.length; i++) {
-      cardList.push(<Card key={"cat" + i} setScore={this.setScore} img={cats[i]} />)
+      //cardList.push(<Card key={"cat" + i} setScore={this.setScore} img={cats[i]} />)\
+      cardList.push({
+        img: cats[i],
+        index: i,
+        cardFound: false,
+        isFlipped: false,
+      })
     }
     return this.shuffleCards(cardList);
   }
@@ -35,34 +41,45 @@ class Game extends React.Component {
     return array;
   }
 
-  setScore = (score) => {
-    let cardList, newScore;
+  setScore = (score, key) => {
+    let cardList = this.state.cardList
+    let newScore = 0;
     if (score) {
       cardList = this.createCards();
-      newScore = 0;
       console.log("found the same image again");
     } else {
+      cardList[key].cardFound = true;
       cardList = this.shuffleCards(this.state.cardList);
-      newScore = this.state.score + 1;
+      newScore = this.state.score;
+      newScore++;
       console.log("found a new image");
     }
+    console.log("time to update")
+    console.log(cardList)
     setTimeout(this.setState({ cardList: cardList, score: newScore }), 2000);
   }
 
   render() {
+    const self = this;
     return (
       <div>
         <Titlebar />
         <ScoreBoard score={this.state.score} />
         <div className="container">
           <div style={{ paddingTop: "5px", paddingBottom: "5px" }} className="row">
-            {this.state.cardList.slice(0, 3)}
+            {this.state.cardList.slice(0, 3).map((elem, i) => {
+              return <Card cardFound={elem.cardFound} isFlipped= {elem.isFlipped} key={elem.index} index={elem.index} setScore={self.setScore} img={elem.img} />
+            })}
           </div>
           <div style={{ paddingTop: "5px", paddingBottom: "5px" }} className="row">
-            {this.state.cardList.slice(3, 6)}
+          {this.state.cardList.slice(3, 6).map((elem, i) => {
+              return <Card cardFound={elem.cardFound} isFlipped= {elem.isFlipped} key={elem.index} index={elem.index} setScore={self.setScore} img={elem.img} />
+            })}
           </div>
           <div style={{ paddingTop: "5px", paddingBottom: "5px" }} className="row">
-            {this.state.cardList.slice(6)}
+          {this.state.cardList.slice(6).map((elem, i) => {
+              return <Card cardFound={elem.cardFound} isFlipped= {elem.isFlipped} key={elem.index} index={elem.index} setScore={self.setScore} img={elem.img} />
+            })}
           </div>
         </div>
       </div>

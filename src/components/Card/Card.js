@@ -13,12 +13,11 @@ class Card extends React.Component {
 
     handleClick(e) {
         e.preventDefault()
-        this.setState({ isFlipped: !this.state.isFlipped })
-        this.props.setScore(this.state.cardFound)
-        this.setState({cardFound: true})
+        this.setState({cardFound: true, isFlipped: true})
+        this.props.setScore(this.state.cardFound, this.props.index)
     }
     componentDidMount() {
-        this.setState({isFlipped: false})
+        this.setState({found: this.props.found})
     }
     render() {
         return (
